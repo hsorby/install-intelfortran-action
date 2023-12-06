@@ -2,12 +2,15 @@
 
 [![GitHub tag](https://img.shields.io/github/tag/modflowpy/install-intelfortran-action.svg)](https://github.com/modflowpy/install-intelfortran-action/tags/latest)
 [![CI](https://github.com/modflowpy/install-intelfortran-action/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/modflowpy/install-intelfortran-action/actions/workflows/ci.yml)
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
 
 An action to install and cache [Intel OneAPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/fortran-compiler.html#gs.bksc2p) Fortran and C/C++ compilers via the [HPC Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/hpc-toolkit.html#gs.g10hgy).
 
+**Note:** Maintenance of this action will cease in 2024. [`fortran-lang/setup-fortran`](https://github.com/fortran-lang/setup-fortran) is recommended instead. This action will disable itself 10% of the time until then (to avoid this, use a previous tag).
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 
 - [Overview](#overview)
 - [Usage](#usage)
@@ -18,6 +21,7 @@ An action to install and cache [Intel OneAPI](https://www.intel.com/content/www/
     - [Setting oneAPI variables on Linux/macOS](#setting-oneapi-variables-on-linuxmacos)
     - [Setting oneAPI variables on Windows](#setting-oneapi-variables-on-windows)
   - [`cache`](#cache)
+  - [`ignore`](#ignore)
 - [Outputs](#outputs)
   - [`cache-hit`](#cache-hit)
 - [Windows caveats](#windows-caveats)
@@ -151,15 +155,16 @@ While the HPC toolkit's install location can be selected freely on Linux and Mac
 
 ### Conda `Scripts`
 
-On Windows, this action can stomp on system path configurations set up by `mamba-org/provision-with-micromamba`, causing programs in `<micromamba root>\envs\<your environment name>\Scripts` not to be found when `shell: pwsh` is used. The recommended pattern to avoid this is:
+On Windows, this action can stomp on system path configurations set up by `mamba-org/provision-with-micromamba` and `setup-micromamba`, causing programs in `<micromamba root>\envs\<your environment name>\Scripts` not to be found when `shell: pwsh` is used. The recommended pattern to avoid this is:
 
-1) use `mamba-org/provision-with-micromamba@main`
-2) use `modflowpy/install-intelfortran-action@v1`
-3) add a step like the following before any steps expecting to use the Micromamba environment (implemented in Powershell below, but need not be):
+1) Use `mamba-org/provision-with-micromamba@main` or `setup-micromamba@v1`. If the former, the root is `C:\Users\runneradmin\micromamba-root\`. If the latter, specify the root with the `micromamba-root-path` input (e.g., `${{ runner.temp }}/micromamba-root`).
+2) Use `modflowpy/install-intelfortran-action@v1`
+3) Add a step like the following to add the `Scripts` dir to the path, before any steps expecting to use the Micromamba environment (implemented in Powershell below, but need not be):
 
 ```pwsh
-# update the path with your environment name
+# former for provision-with-micromamba, latter for setup-micromamba
 $path = "C:\Users\runneradmin\micromamba-root\envs\<env name>\Scripts"
+# $path = "${{ runner.temp }}\micromamba-root\envs\<env name>\Scripts"
 echo $path | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 ```
 

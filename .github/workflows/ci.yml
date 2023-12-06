@@ -1,9 +1,6 @@
 name: CI
 on:
   push:
-    branches:
-      - main
-      - develop*
     paths-ignore:
       - '**.md'
   pull_request:
@@ -16,10 +13,11 @@ jobs:
   test:
     name: Test
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-18.04, ubuntu-20.04, ubuntu-22.04, macos-11, macos-12, windows-2019, windows-2022 ]
+        os: [ ubuntu-20.04, ubuntu-22.04, macos-11, macos-12, windows-2019, windows-2022 ]
         path: [ absolute, relative, tilde, default ]
         setvars: [ 'true', 'false' ]
     steps:
